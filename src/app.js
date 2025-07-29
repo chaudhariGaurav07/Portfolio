@@ -4,8 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 
-
-export const app = express();
+const app = express();
 
 // Middleware
 app.use(cors());
@@ -20,6 +19,8 @@ app.use(rateLimit({
 }));
 
 // Routes
+import userRouter from './routes/auth.routes.js'
+app.use("/api/v1/auth",userRouter)
 
-// Error Handler
+export {app}
 
