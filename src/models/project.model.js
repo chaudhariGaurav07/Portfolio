@@ -4,7 +4,6 @@ const projectSchema = new mongoose.Schema({
     title : {
         type : String,
         required :  true,
-        
     },
     techStack : [
          String 
@@ -12,7 +11,7 @@ const projectSchema = new mongoose.Schema({
     githubLink: {
         type: String
     },
-    discription : {
+    description : {
         type : String
     },
     liveDemo : {

@@ -1,26 +1,30 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import morgan from "morgan";
-import rateLimit from "express-rate-limit";
+  import express from "express";
+  import cors from "cors";
+  import helmet from "helmet";
+  import morgan from "morgan";
+  import rateLimit from "express-rate-limit";
 
-const app = express();
+  const app = express();
 
-// Middleware
-app.use(cors());
-app.use(helmet());
-app.use(morgan("dev"));
-app.use(express.json());
+  // Middleware
+  app.use(cors());
+  app.use(helmet());
+  app.use(morgan("dev"));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-// Rate Limiter
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-}));
+  // Rate Limiter
+  app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100
+  }));
 
-// Routes
-import userRouter from './routes/auth.routes.js'
-app.use("/api/v1/auth",userRouter)
+  // Routes
+  import userRouter from './routes/auth.routes.js'
+  import projectRouter from "./routes/project.routes.js"
 
-export {app}
+  app.use("/api/v1/auth",userRouter)
+  app.use("/api/v1/project", projectRouter)
+
+  export {app}
 
