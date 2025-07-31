@@ -22,9 +22,12 @@
   // Routes
   import userRouter from './routes/auth.routes.js'
   import projectRouter from "./routes/project.routes.js"
+  import contactRouter from "./routes/contact.routes.js"
 
   app.use("/api/v1/auth",userRouter)
   app.use("/api/v1/project", projectRouter)
+  app.use("/api/v1/contact", contactRouter)
+
 
   export {app}
 
