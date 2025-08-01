@@ -6,6 +6,7 @@ import {
   getAllProjects,
   updateProject,
   deleteProject,
+  filterProjectsByTech
 } from "../controllers/project.controller.js";
 
 
@@ -13,6 +14,7 @@ const router = Router()
 
 // Public
 router.get("/",getAllProjects)
+router.get("/filter", filterProjectsByTech);
 
 // Admin only
 router.post("/", requireAuth, upload.single("image"), createProject)

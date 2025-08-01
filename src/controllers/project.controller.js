@@ -6,9 +6,9 @@ export const createProject = async (req, res, next) => {
   try {
     const { title, description, techStack, githubLink, liveDemo } = req.body;
     if (!req.body.title) {
-  return res.status(400).json({ error: "Project title is required" });
-}
-    console.log(title)
+      return res.status(400).json({ error: "Project title is required" });
+    }
+    console.log(title);
     let imageUrl = "";
 
     if (req.file) {
@@ -35,14 +35,11 @@ export const createProject = async (req, res, next) => {
       imageUrl,
     });
 
-    res.status(200).json(
-      new ApiResponse(200, { project }, "Project created")
-    );
+    res.status(200).json(new ApiResponse(200, { project }, "Project created"));
   } catch (err) {
     next(err);
   }
 };
-
 
 export const getAllProjects = async (req, res, next) => {
   try {
@@ -76,19 +73,40 @@ export const updateProject = async (req, res, next) => {
       new: true,
     });
 
-    res.status(200).json(
-      new ApiResponse(200, { project: updated }, "Project updated")
-    );
+    res
+      .status(200)
+      .json(new ApiResponse(200, { project: updated }, "Project updated"));
   } catch (err) {
     next(err);
   }
 };
 
-
 export const deleteProject = async (req, res, next) => {
   try {
     await Project.findByIdAndDelete(req.params.id);
     res.status(200).json(new ApiResponse(200, null, "Project deleted"));
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const filterProjectsByTech = async (req, res, next) => {
+  try {
+    const { tech } = req.query;
+
+    if (!tech) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Tech stack filter is required"));
+    }
+
+    const filteredProjects = await Project.find({ techStack: { $in: [tech] } });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, filteredProjects, "Filtered projects fetched")
+      );
   } catch (err) {
     next(err);
   }
