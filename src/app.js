@@ -25,13 +25,15 @@
   import contactRouter from "./routes/contact.routes.js"
   import analyticsRouter from "./routes/analytics.routes.js"
   import aiRoutes from "./routes/ai.routes.js";
+  import blogRoutes from "./routes/blog.routes.js"
 
+  
   app.use("/api/v1/auth",userRouter)
   app.use("/api/v1/project", projectRouter)
   app.use("/api/v1/contact", contactRouter)
   app.use("/api/v1/analytics", analyticsRouter)
   app.use("/api/v1/ai", aiRoutes);
-
+  app.use("/api/v1/blog", blogRoutes)
 
 
   export {app}
