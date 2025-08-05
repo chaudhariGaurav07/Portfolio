@@ -8,6 +8,9 @@ export const createProject = async (req, res, next) => {
     if (!req.body.title) {
       return res.status(400).json({ error: "Project title is required" });
     }
+    if (!req.body.description) {
+      return res.status(400).json({ error: "Project des is required" });
+    }
     console.log(title);
     let imageUrl = "";
 
@@ -27,13 +30,14 @@ export const createProject = async (req, res, next) => {
     }
 
     const project = await Project.create({
-      title,
-      description,
-      techStack: techStack?.split(",") || [],
-      githubLink,
-      liveDemo,
-      imageUrl,
-    });
+  title: title?.trim(),
+  description: description?.trim(),
+  techStack: techStack?.split(",").map(t => t.trim()) || [],
+  githubLink: githubLink?.trim(),
+  liveDemo: liveDemo?.trim(),
+  imageUrl,
+});
+
 
     res.status(200).json(new ApiResponse(200, { project }, "Project created"));
   } catch (err) {
