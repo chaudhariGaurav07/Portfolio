@@ -1,10 +1,31 @@
 import { Blog } from "../models/blog.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { v2 as cloudinary } from 'cloudinary';
+import streamifier from 'streamifier';
 
 export const createBlog = async (req, res, next) => {
   try {
     const { title, content, tags, category, published } = req.body;
-    const image = req.file?.path || null;
+
+    let imageUrl = null;
+
+    if (req.file) {
+      const streamUpload = (req) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "blogs" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            }
+          );
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      const result = await streamUpload(req);
+      imageUrl = result.secure_url;
+    }
 
     const blog = await Blog.create({
       title,
@@ -12,7 +33,7 @@ export const createBlog = async (req, res, next) => {
       tags,
       category,
       published,
-      image,
+      image: imageUrl,
     });
 
     res.status(201).json(new ApiResponse(201, blog, "Blog created"));
