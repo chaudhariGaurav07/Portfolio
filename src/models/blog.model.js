@@ -16,13 +16,12 @@ const blogSchema = new mongoose.Schema({
   category: {
     type: String,
   },
-  published: {
-    type: Boolean,
-    default: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  publishedAt: { type: Date, default: Date.now },
+  readTime: Number, // You can calculate it from content length
+  author: String,
+  excerpt: {
+    type: String,
+    required: true,
   },
 });
 
