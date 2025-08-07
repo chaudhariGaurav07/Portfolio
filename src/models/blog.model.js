@@ -23,6 +23,12 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  externalLink: {
+  type: String,
+  default: null,
+  required: true
+}
+
 });
 
 export const Blog = mongoose.model("Blog", blogSchema);
