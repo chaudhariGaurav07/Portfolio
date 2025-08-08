@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { v2 as cloudinary } from "cloudinary";
 import streamifier from "streamifier";
 
+// Create Blog
 export const createBlog = async (req, res, next) => {
   try {
     const { title, content, tags, category, externalLink, published } = req.body;
@@ -10,7 +11,7 @@ export const createBlog = async (req, res, next) => {
     let imageUrl = null;
 
     if (req.file) {
-      const streamUpload = (req) => {
+      const streamUpload = () => {
         return new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
             { folder: "blogs" },
@@ -23,13 +24,13 @@ export const createBlog = async (req, res, next) => {
         });
       };
 
-      const result = await streamUpload(req);
+      const result = await streamUpload();
       imageUrl = result.secure_url;
     }
 
     const words = content.split(/\s+/).length;
     const readTime = Math.ceil(words / 200); // 200 wpm average
-    const authorName = req.user?.name || "Gaurav Chaudhari"; 
+    const authorName = req.user?.name || "Gaurav Chaudhari";
     const excerpt = content.split(/\s+/).slice(0, 40).join(" ") + "...";
 
     const blog = await Blog.create({
@@ -52,7 +53,7 @@ export const createBlog = async (req, res, next) => {
   }
 };
 
-
+// Get All Blogs
 export const getAllBlog = async (req, res, next) => {
   try {
     const blogs = await Blog.find({ published: true }).sort({ createdAt: -1 });
@@ -62,6 +63,7 @@ export const getAllBlog = async (req, res, next) => {
   }
 };
 
+// Get Single Blog
 export const getSingleBlog = async (req, res, next) => {
   try {
     const blog = await Blog.findById(req.params.id);
@@ -74,22 +76,48 @@ export const getSingleBlog = async (req, res, next) => {
   }
 };
 
+// Update Blog
 export const updateBlog = async (req, res, next) => {
   try {
-    const { title, content, tags, category, published } = req.body;
-    const image = req.file?.path;
+    const { title, content, tags, category, externalLink, published } = req.body;
+
+    let imageUrl = null;
+    if (req.file) {
+      const streamUpload = () => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "blogs" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            }
+          );
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      const result = await streamUpload();
+      imageUrl = result.secure_url;
+    }
 
     const blog = await Blog.findById(req.params.id);
     if (!blog) {
       return res.status(404).json(new ApiResponse(404, null, "Blog not found"));
     }
 
+    // Update fields
     blog.title = title || blog.title;
     blog.content = content || blog.content;
     blog.tags = tags || blog.tags;
     blog.category = category || blog.category;
+    blog.externalLink = externalLink || blog.externalLink;
     blog.published = published !== undefined ? published : blog.published;
-    if (image) blog.image = image;
+    if (content) {
+      const words = content.split(/\s+/).length;
+      blog.readTime = Math.ceil(words / 200);
+      blog.excerpt = content.split(/\s+/).slice(0, 40).join(" ") + "...";
+    }
+    if (imageUrl) blog.image = imageUrl;
 
     await blog.save();
 
@@ -99,6 +127,7 @@ export const updateBlog = async (req, res, next) => {
   }
 };
 
+// Delete Blog
 export const deleteBlog = async (req, res, next) => {
   try {
     const blog = await Blog.findByIdAndDelete(req.params.id);
