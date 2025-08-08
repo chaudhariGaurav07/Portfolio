@@ -5,7 +5,7 @@ import streamifier from "streamifier";
 
 export const createBlog = async (req, res, next) => {
   try {
-    const { title, content, tags, category, externalLink } = req.body;
+    const { title, content, tags, category, externalLink, published } = req.body;
 
     let imageUrl = null;
 
@@ -36,6 +36,7 @@ export const createBlog = async (req, res, next) => {
       title,
       content,
       tags,
+      published,
       category,
       publishedAt: new Date(),
       image: imageUrl,

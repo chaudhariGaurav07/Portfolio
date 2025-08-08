@@ -27,7 +27,11 @@ const blogSchema = new mongoose.Schema({
   type: String,
   default: null,
   required: true
-}
+},
+ published: {
+    type: Boolean,
+    default: false,
+  },
 
 });
 
