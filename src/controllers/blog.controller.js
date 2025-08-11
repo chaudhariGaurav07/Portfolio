@@ -6,7 +6,12 @@ import streamifier from "streamifier";
 // Create Blog
 export const createBlog = async (req, res, next) => {
   try {
-    const { title, content, tags, category, externalLink, published } = req.body;
+    let { title, content, tags, category, externalLink, published, publishedAt } = req.body;
+
+    // Convert comma-separated string to array if needed
+    if (typeof tags === "string") {
+      tags = tags.split(",").map(tag => tag.trim()).filter(Boolean);
+    }
 
     let imageUrl = null;
 
@@ -29,7 +34,7 @@ export const createBlog = async (req, res, next) => {
     }
 
     const words = content.split(/\s+/).length;
-    const readTime = Math.ceil(words / 200); // 200 wpm average
+    const readTime = Math.ceil(words / 200);
     const authorName = req.user?.name || "Gaurav Chaudhari";
     const excerpt = content.split(/\s+/).slice(0, 40).join(" ") + "...";
 
@@ -39,7 +44,8 @@ export const createBlog = async (req, res, next) => {
       tags,
       published,
       category,
-      publishedAt: new Date(),
+      // Use manual date if provided, else now
+      publishedAt: publishedAt ? new Date(publishedAt) : new Date(),
       image: imageUrl,
       readTime,
       author: authorName,
@@ -52,6 +58,7 @@ export const createBlog = async (req, res, next) => {
     next(err);
   }
 };
+
 
 // Get All Blogs
 export const getAllBlog = async (req, res, next) => {
@@ -79,7 +86,12 @@ export const getSingleBlog = async (req, res, next) => {
 // Update Blog
 export const updateBlog = async (req, res, next) => {
   try {
-    const { title, content, tags, category, externalLink, published } = req.body;
+    let { title, content, tags, category, externalLink, published, publishedAt } = req.body;
+
+    // Convert comma-separated string to array if needed
+    if (typeof tags === "string") {
+      tags = tags.split(",").map(tag => tag.trim()).filter(Boolean);
+    }
 
     let imageUrl = null;
     if (req.file) {
@@ -112,6 +124,8 @@ export const updateBlog = async (req, res, next) => {
     blog.category = category || blog.category;
     blog.externalLink = externalLink || blog.externalLink;
     blog.published = published !== undefined ? published : blog.published;
+    if (publishedAt) blog.publishedAt = new Date(publishedAt);
+
     if (content) {
       const words = content.split(/\s+/).length;
       blog.readTime = Math.ceil(words / 200);
@@ -126,6 +140,7 @@ export const updateBlog = async (req, res, next) => {
     next(err);
   }
 };
+
 
 // Delete Blog
 export const deleteBlog = async (req, res, next) => {
